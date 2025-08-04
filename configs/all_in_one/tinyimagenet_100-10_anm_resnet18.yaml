@@ -1,0 +1,70 @@
+scenario: cil 100-10
+dataset_name: tinyimagenet
+dataset_root: ~/data/datasets/tiny-imagenet-200/
+train_transform: tinyimagenet_train_2
+test_transform: tinyimagenet_test_1
+class_order: [66, 187, 101, 193, 111, 121, 13, 2, 64, 44, 136, 170, 128, 76, 158, 167, 45, 130, 30, 3, 159, 15, 42, 126, 186, 162, 47, 110, 5, 194, 37, 122, 12, 36, 153, 69, 61, 195, 32, 172, 171, 60, 10, 144, 160, 52, 125, 106, 73, 113, 105, 95, 103, 145, 43, 0, 161, 192, 16, 80, 102, 38, 156, 176, 135, 78, 115, 19, 14, 177, 146, 179, 65, 84, 165, 46, 104, 79, 54, 196, 85, 118, 109, 133, 142, 33, 18, 140, 123, 175, 63, 83, 148, 100, 155, 72, 27, 184, 112, 51, 174, 4, 29, 183, 99, 98, 131, 124, 198, 134, 178, 120, 34, 48, 169, 138, 149, 132, 127, 21, 81, 77, 9, 82, 164, 119, 89, 68, 53, 90, 94, 41, 93, 116, 199, 157, 25, 180, 147, 74, 58, 152, 17, 49, 92, 75, 141, 20, 96, 31, 137, 117, 11, 67, 88, 91, 24, 97, 182, 190, 86, 181, 39, 168, 87, 185, 40, 1, 71, 150, 114, 56, 107, 191, 166, 50, 143, 197, 154, 129, 59, 55, 23, 7, 8, 108, 151, 22, 139, 173, 26, 188, 35, 57, 62, 70, 189, 6, 28, 163]
+
+method: anm
+
+init_epochs: 200 # 200
+inc_epochs: 170 # 170
+eval_interval: 5
+
+
+aux_factor: 2
+distill_factor: 1
+num_aug: 2
+
+backbone_configs: 
+  name: resnet18
+
+network_configs:
+  classifier_type: 'unified'
+  proj_hidden_dim: 2048
+  proj_output_dim: 1024
+  init_from_last: false
+  init_from_interpolation: true
+  init_interpolation_factor: 0.95
+  attn_num_heads: 8
+  merge_attn: true
+
+memory_configs:
+  fixed_size: false
+  memory_size: 2000
+
+trainloader_params:
+  batch_size: 128
+  num_workers: 8
+  drop_last: false
+
+testloader_params:
+  batch_size: 192
+  num_workers: 8
+  drop_last: false
+
+init_optimizer_configs:
+  name: sgd
+  params:
+    lr: 0.1
+    momentum: 0.9
+    weight_decay: 5.e-4
+
+init_scheduler_configs:
+  name: multistep
+  params:
+    milestones: [60, 120, 170]
+    gamma: 0.1
+
+inc_optimizer_configs:
+  name: sgd
+  params:
+    lr: 0.1
+    momentum: 0.9
+    weight_decay: 2.e-4
+
+inc_scheduler_configs:
+  name: multistep
+  params:
+    milestones: [80, 120, 150]
+    gamma: 0.1
